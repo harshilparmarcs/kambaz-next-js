@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Lab1() {
   return (
@@ -120,14 +121,14 @@ export default function Lab1() {
       <div id="wd-images" style={{ marginTop: 16 }}>
         <h4>Image Tag</h4>
         <p>Starship image (remote):</p>
-        <img
+        <Image
           id="wd-starship"
-          width="400"
+          width={400}
           src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg"
           alt="Starship"
         />
         <p>Wall E:</p>
-        <img id="wd-teslabot" src="https://m.media-amazon.com/images/M/MV5BMTMyOTk0NDMwMF5BMl5BanBnXkFtZTcwMzgwMzMzMw@@._V1_.jpg" height="300" width="300" alt="WallE" />
+        <Image id="wd-teslabot" src="https://m.media-amazon.com/images/M/MV5BMTMyOTk0NDMwMF5BMl5BanBnXkFtZTcwMzgwMzMzMw@@._V1_.jpg" height="300" width="300" alt="WallE" />
       </div>
 
       <div id="wd-forms" style={{ marginTop: 16 }}>

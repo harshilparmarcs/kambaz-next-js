@@ -1,11 +1,22 @@
 "use client";
+
 import { useParams } from "next/navigation";
+
+interface ModuleLesson {
+  title: string;
+  items: string[];
+}
+
+interface CourseModule {
+  title: string;
+  lessons: ModuleLesson[];
+}
 
 export default function Modules() {
   const params = useParams();
   const cid = params.cid as string;
 
-  const courseModules: Record<string, any[]> = {
+  const courseModules: Record<string, CourseModule[]> = {
     "1234":[
       {
         title: "Week 1 - React Fundamentals",
@@ -75,11 +86,11 @@ export default function Modules() {
   return (
     <div>
       <ul id="wd-modules">
-        {modules.map((module:any , moduleIndex: number) => (
+        {modules.map((module:CourseModule , moduleIndex: number) => (
           <li key={moduleIndex} className="wd-module">
             <div className="wd-title">{module.title}</div>
             <ul className="wd-lessons">
-              {module.lessons.map((lesson:any, lessonIndex:number) => (
+              {module.lessons.map((lesson:ModuleLesson, lessonIndex:number) => (
                 <li key={lessonIndex} className="wd-lesson">
                   <span className="wd-title">{lesson.title}</span>
                   <ul className="wd-content">
