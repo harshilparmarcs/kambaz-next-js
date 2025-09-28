@@ -121,14 +121,11 @@ export default function Lab1() {
       <div id="wd-images" style={{ marginTop: 16 }}>
         <h4>Image Tag</h4>
         <p>Starship image (remote):</p>
-        <Image
-          id="wd-starship"
-          width={400}
-          src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg"
+        <img id="wd-starship" width="400" height="300" src="https://media.wired.com/photos/5d2d09439a6762000863bf47/3:2/w_1600%2Cc_limit/Science_Starship_43895099655_64490f5eed_k.jpg"
           alt="Starship"
         />
         <p>Wall E:</p>
-        <Image id="wd-teslabot" src="https://m.media-amazon.com/images/M/MV5BMTMyOTk0NDMwMF5BMl5BanBnXkFtZTcwMzgwMzMzMw@@._V1_.jpg" height="300" width="300" alt="WallE" />
+        <Image id="wd-teslabot" src="/images/walle.jpg" height="300" width="300" alt="WallE" />
       </div>
 
       <div id="wd-forms" style={{ marginTop: 16 }}>
