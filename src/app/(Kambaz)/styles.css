@@ -45,13 +45,5 @@ body * { font-family:
 .wd-lesson {
   border-left: 3px solid green !important;
 }
-.wd-nav-link {
-  color: red;
-  border-left: 3px solid transparent;
-}
 
-.wd-nav-link.active {
-  border-left: 3px solid black;
-  color: black;
-}
 
