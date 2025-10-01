@@ -1,6 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import ModulesControls from "./ModulesControls";
+import { ListGroup, ListGroupItem } from "react-bootstrap";
+import { BsGripVertical } from "react-icons/bs";
+import ModuleControlButtons from "./ModuleControlButtons";
+import LessonControlButtons from "./LessonControlButtons";
 
 interface ModuleLesson {
   title: string;
@@ -24,6 +29,12 @@ export default function Modules() {
           { title: "LEARNING OBJECTIVES", items: ["Introduction to React", "Understanding JSX", "Component Basics"] },
           { title: "READING", items: ["React Documentation - Getting Started", "Modern JavaScript Features"] },
           { title: "SLIDES", items: ["Introduction to React", "JSX Syntax", "Component Architecture"] }
+        ]
+      },
+      {
+        title: "Week 2 - State and Props",
+        lessons: [
+          { title: "LEARNING OBJECTIVES", items: ["State Management", "Props Handling", "Event Handling in React"] }
         ]
       }
     ],
@@ -85,24 +96,40 @@ export default function Modules() {
   
   return (
     <div>
-      <ul id="wd-modules">
+      <ModulesControls /><br /><br /><br /><br />
+
+      <ListGroup className="rounded-0" id="wd-modules">
         {modules.map((module:CourseModule , moduleIndex: number) => (
-          <li key={moduleIndex} className="wd-module">
-            <div className="wd-title">{module.title}</div>
-            <ul className="wd-lessons">
+          <ListGroupItem key={moduleIndex} className="wd-module p-0 mb-5 fs-5 border-gray">
+            <div className="wd-title p-3 ps-2 bg-secondary">
+               <BsGripVertical className="me-2 fs-3" />
+               {module.title}
+               <ModuleControlButtons/>
+            </div>
+          
+          <ListGroup className="wd-lesson rounded-0">
               {module.lessons.map((lesson:ModuleLesson, lessonIndex:number) => (
-                <li key={lessonIndex} className="wd-lesson">
-                  <span className="wd-title">{lesson.title}</span>
-                  <ul className="wd-content">
+                <ListGroupItem key={lessonIndex} className="wd-lesson p-2 ps-2">
+                  <div className="wd-lesson-title">
+                    <BsGripVertical className="me-2 fs-3" />
+                    {lesson.title}
+                    <LessonControlButtons />
+                  </div>
+        
+            <ListGroup className="wd-content rounded-0">
                     {lesson.items.map((item:string, itemIndex:number) => (
-                      <li key={itemIndex} className="wd-content-item">{item}</li>
+                      <ListGroupItem key={itemIndex} className="wd-content-item p-3 ps-1">
+                        <BsGripVertical className="me-2 fs-3" />
+                        {item}
+                        <LessonControlButtons />
+                      </ListGroupItem>
                     ))}
-                  </ul>
-                </li>
+                  </ListGroup>
+                </ListGroupItem>
               ))}
-            </ul>
-          </li>
+            </ListGroup>
+          </ListGroupItem>
         ))}
-      </ul>
+      </ListGroup>
     </div>
 );}

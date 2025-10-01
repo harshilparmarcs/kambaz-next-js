@@ -1,0 +1,14 @@
+.nav-link {
+  color: red;
+  text-decoration: none;
+  padding-left: 10px;
+  border-left: 3px solid transparent;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.nav-link.active {
+  color: black;
+  border-left: 3px solid black;
+  font-weight: bold;
+}
