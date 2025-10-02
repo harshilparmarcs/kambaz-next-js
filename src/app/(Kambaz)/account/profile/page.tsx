@@ -12,7 +12,7 @@ export default function Profile() {
       <FormControl type="date" id="wd-dob" className="mb-4" placeholder="mm/dd/yyyy" />
       <FormControl defaultValue="alice@wonderland" type="email" id="wd-email" className="mb-4"/>
       <FormControl defaultValue="User" type="tel" id="wd-phone" className="mb-4"/>
-      <Link href="Signin" className="btn btn-danger w-100 mb-2 bg-color-red" > Sign out </Link>
+      <Link href="/account/signin" className="btn btn-danger w-100 mb-2 bg-color-red" > Sign out </Link>
     </div>
 );
 }
