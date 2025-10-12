@@ -1,16 +1,29 @@
+
+"use client";
+
+import {useParams } from "next/navigation";
 import { Button, Col, Form, FormControl, FormLabel, Row } from "react-bootstrap";
 import { FaCalendarAlt } from "react-icons/fa";
 
+import * as db from "../../../../Database";
+
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams();
+  const assignment = db.assignments.find((a: any) => a._id === aid);
+
+  if (!assignment) {
+    return <div>Assignment not found</div>;
+  }
+
   return (
     
    <div id="wd-assignments-editor" className="me-5">
       <Form>
-        
+        <h3>Edit Assignment: {assignment.title}</h3>
         <div className="mb-3">
           <FormLabel htmlFor="wd-name">Assignment Name</FormLabel>
-          <FormControl type="text" id="wd-name" defaultValue="A1" />
+          <FormControl type="text" id="wd-name" defaultValue=""/>
         </div>
         
         <div className="mb-3">

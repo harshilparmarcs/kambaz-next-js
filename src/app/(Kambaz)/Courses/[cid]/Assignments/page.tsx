@@ -9,41 +9,23 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
 import GreenCheckmark from "../Modules/GreenCheckmark";
 
-interface Assignment {
-  id: string;
-  title: string;
-  availableFrom: string;
-  dueDate: string;
-  points: number;
-}
+import * as db from "../../../Database";
 
 export default function Assignments() {
-  const params = useParams();
-  const cid = params.cid as string;
+  const { cid } = useParams();
+  const assignments = db.assignments.filter((assignment) => assignment.course === cid);
 
-  const assignments: Assignment[] = [
-    {
-      id: "A1",
-      title: "ENV + HTML",
-      availableFrom: "May 6 at 12:00am",
-      dueDate: "May 13 at 11:59pm",
-      points: 100
-    },
-    {
-      id: "A2",
-      title: "CSS + BOOTSTRAP",
-      availableFrom: "May 13 at 12:00am",
-      dueDate: "May 20 at 11:59pm",
-      points: 100
-    },
-    {
-      id: "A3",
-      title: "JAVASCRIPT + REACT",
-      availableFrom: "May 20 at 12:00am",
-      dueDate: "May 27 at 11:59pm",
-      points: 100
-    }
-  ];
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+  };    
 
   return (
     <div id="wd-assignments">
@@ -89,9 +71,9 @@ export default function Assignments() {
           </div>
 
           <ListGroup className="rounded-0">
-            {assignments.map((assignment) => (
+            {assignments.map((assignment: any) => (
               <ListGroupItem 
-                key={assignment.id} 
+                key={assignment._id} 
                 className="wd-assignment-list-item p-3 ps-1 d-flex align-items-start border-start-0 border-end-0"
               >
                 <BsGripVertical className="me-2 fs-3 mt-1" />
@@ -99,10 +81,10 @@ export default function Assignments() {
                 
                 <div className="flex-grow-1">
                   <Link 
-                    href={`/Courses/${cid}/Assignments/AssignmentEditor`}
+                    href={`/Courses/${cid}/Assignments/${assignment._id}`}
                     className="wd-assignment-link fw-bold text-dark text-decoration-none"
                   >
-                    {assignment.id} - {assignment.title}
+                    {assignment.title}
                   </Link>
                   
                   <div className="text-danger small mt-1">
@@ -110,11 +92,11 @@ export default function Assignments() {
                   </div>
                   
                   <div className="small text-muted mt-1">
-                    <span className="fw-bold">Not available until</span> {assignment.availableFrom} |
+                    <span className="fw-bold">Not available until: </span>{formatDate(assignment.availableFrom)} |
                   </div>
                   
                   <div className="small mt-1">
-                    <span className="fw-bold">Due</span> {assignment.dueDate} | {assignment.points} pts
+                    <span className="fw-bold">Due: </span>{formatDate(assignment.dueDate)} | {assignment.points} pts
                   </div>
                 </div>
 
