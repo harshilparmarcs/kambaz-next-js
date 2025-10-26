@@ -1,21 +1,42 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAssignment } from "./reducer";
 import Link from "next/link";
-import { Button, ListGroup, ListGroupItem } from "react-bootstrap";
-import { BsGripVertical } from "react-icons/bs";
+import { Button, ListGroup, ListGroupItem, Modal } from "react-bootstrap";
+import { BsGripVertical, BsTrash } from "react-icons/bs";
 import { MdOutlineAssignment } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
 import GreenCheckmark from "../Modules/GreenCheckmark";
 
-import * as db from "../../../Database";
-
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments.filter((assignment) => assignment.course === cid);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  
+  
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
+
+  
+  const isFaculty = currentUser?.role === "FACULTY";
+
+  
+  const courseAssignments = assignments.filter((assignment: any) => assignment.course === cid);
+  
+  const filteredAssignments = courseAssignments.filter((assignment: any) =>
+    assignment.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       month: 'short', 
@@ -25,11 +46,28 @@ export default function Assignments() {
       minute: 'numeric',
       hour12: true,
     });
-  };    
+  };
+
+  const handleDelete = (assignmentId: string) => {
+    setAssignmentToDelete(assignmentId);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (assignmentToDelete) {
+      dispatch(deleteAssignment(assignmentToDelete));
+      setShowDeleteDialog(false);
+      setAssignmentToDelete(null);
+    }
+  };
+
+  
+  const handleAddAssignment = () => {
+    router.push(`/Courses/${cid}/Assignments/new`);
+  };
 
   return (
     <div id="wd-assignments">
-      
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div className="input-group" style={{ maxWidth: "300px" }}>
           <span className="input-group-text bg-white border-end-0">
@@ -40,24 +78,33 @@ export default function Assignments() {
             className="form-control border-start-0" 
             placeholder="Search for Assignments"
             id="wd-search-assignment"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} 
           />
         </div>
         
-        <div>
-          <Button variant="secondary" size="lg" className="me-2" id="wd-add-assignment-group">
-            <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
-            Group
-          </Button>
-          <Button variant="danger" size="lg" id="wd-add-assignment">
-            <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
-            Assignment
-          </Button>
-        </div>
+      
+        {isFaculty && (
+          <div>
+            <Button variant="secondary" size="lg" className="me-2" id="wd-add-assignment-group">
+              <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
+              Group
+            </Button>
+            <Button 
+              variant="danger" 
+              size="lg" 
+              id="wd-add-assignment"
+              onClick={handleAddAssignment} 
+            >
+              <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
+              Assignment
+            </Button>
+          </div>
+        )}
       </div>
 
       <ListGroup className="rounded-0">
         <ListGroupItem className="p-0 fs-5 border-gray">
-          
           <div className="p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
             <div>
               <BsGripVertical className="me-2 fs-3" />
@@ -71,7 +118,7 @@ export default function Assignments() {
           </div>
 
           <ListGroup className="rounded-0">
-            {assignments.map((assignment: any) => (
+            {filteredAssignments.map((assignment: any) => (
               <ListGroupItem 
                 key={assignment._id} 
                 className="wd-assignment-list-item p-3 ps-1 d-flex align-items-start border-start-0 border-end-0"
@@ -92,23 +139,52 @@ export default function Assignments() {
                   </div>
                   
                   <div className="small text-muted mt-1">
-                    <span className="fw-bold">Not available until: </span>{formatDate(assignment.availableFrom)} |
+                    <span className="fw-bold">Not available until: </span>
+                    {formatDate(assignment.availableFromDate || assignment.availableFrom)}
                   </div>
                   
                   <div className="small mt-1">
-                    <span className="fw-bold">Due: </span>{formatDate(assignment.dueDate)} | {assignment.points} pts
+                    <span className="fw-bold">Due: </span>
+                    {formatDate(assignment.dueDate)} | {assignment.points} pts
                   </div>
                 </div>
 
-                <div className="float-end">
+                <div className="float-end d-flex align-items-center">
+            
+                  {isFaculty && (
+                    <Button
+                      variant="link"
+                      className="text-danger p-0 me-2"
+                      onClick={() => handleDelete(assignment._id)}
+                    >
+                      <BsTrash />
+                    </Button>
+                  )}
                   <GreenCheckmark />
-                  <IoEllipsisVertical className="fs-4" />
+                  <IoEllipsisVertical className="fs-4 ms-2" />
                 </div>
               </ListGroupItem>
             ))}
           </ListGroup>
         </ListGroupItem>
       </ListGroup>
+
+      <Modal show={showDeleteDialog} onHide={() => setShowDeleteDialog(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to remove this assignment?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteDialog(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Yes, Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
