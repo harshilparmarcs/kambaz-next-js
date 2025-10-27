@@ -3,7 +3,7 @@
 
 import dynamic from "next/dynamic";
 import { Provider, useSelector } from "react-redux";
-import store from "../store/page";
+import store from "../store/";
 import CounterRedux from "./CounterRedux/page";
 
 const TodoList = dynamic(() => import("./todos/TodoList"), { ssr: false });
