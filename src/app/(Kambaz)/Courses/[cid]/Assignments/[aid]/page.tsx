@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { addAssignment, updateAssignment } from "../reducer";
-import { v4 as uuidv4 } from "uuid";
+import { setAssignments } from "../reducer";
+import * as client from "../client";
 import { Button, Col, Form, FormControl, FormLabel, Row } from "react-bootstrap";
 import { FaCalendarAlt } from "react-icons/fa";
 
@@ -28,7 +28,7 @@ export default function AssignmentEditor() {
     displayGradeAs: "Percentage",
     submissionType: "Online",
   });
-
+  
   useEffect(() => {
     if (!isNewAssignment) {
       const existingAssignment = assignments.find((a: any) => a._id === aid);
@@ -37,25 +37,32 @@ export default function AssignmentEditor() {
       }
     }
   }, [aid, assignments, isNewAssignment]);
-
-  const handleSave = () => {
-    if (isNewAssignment) {
-      const newAssignment = { ...assignment, _id: uuidv4() };
-      dispatch(addAssignment(newAssignment));
-    } else {
-      dispatch(updateAssignment(assignment));
+  
+  const handleSave = async () => {
+    try {
+      if (isNewAssignment) {
+        const newAssignment = await client.createAssignmentForCourse(cid as string, assignment);
+        dispatch(setAssignments([...assignments, newAssignment]));
+      } else {
+        await client.updateAssignment(assignment);
+        dispatch(setAssignments(
+          assignments.map((a: any) => (a._id === assignment._id ? assignment : a))
+        ));
+      }
+      router.push(`/Courses/${cid}/Assignments`);
+    } catch (error) {
+      console.error("Error saving assignment:", error);
     }
-    router.push(`/Courses/${cid}/Assignments`);
   };
-
+  
   const handleCancel = () => {
     router.push(`/Courses/${cid}/Assignments`);
   };
-
+  
   if (!isNewAssignment && !assignment._id) {
     return <div>Assignment not found</div>;
   }
-
+  
   return (
     <div id="wd-assignments-editor" className="me-5">
       <Form>
@@ -150,6 +157,7 @@ export default function AssignmentEditor() {
                 <option value="No Submission">No Submission</option>
                 <option value="External Tool">External Tool</option>
               </Form.Select>
+              
               <div>
                 <FormLabel className="fw-bold mb-2">Online Entry Options</FormLabel>
                 <Form.Check type="checkbox" id="wd-text-entry" label="Text Entry" className="mb-1" />

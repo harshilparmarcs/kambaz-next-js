@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteAssignment } from "./reducer";
+import { setAssignments } from "./reducer";
+import * as client from "./client";
 import Link from "next/link";
 import { Button, ListGroup, ListGroupItem, Modal } from "react-bootstrap";
 import { BsGripVertical, BsTrash } from "react-icons/bs";
@@ -14,9 +15,12 @@ import GreenCheckmark from "../Modules/GreenCheckmark";
 
 export default function Assignments() {
   const { cid } = useParams();
+
+  console.log("CID:", cid);
+  console.log("Fetching assignments...");
+
   const router = useRouter();
   const dispatch = useDispatch();
-  
   
   const { assignments } = useSelector((state: any) => state.assignmentsReducer);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
@@ -24,17 +28,30 @@ export default function Assignments() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
-
   
   const isFaculty = currentUser?.role === "FACULTY";
-
+  
+  const fetchAssignments = async () => {
+    console.log("Inside fetchAssignments");
+    try {
+      const assignments = await client.findAssignmentsForCourse(cid as string);
+      console.log("Fetched assignments:", assignments); 
+      dispatch(setAssignments(assignments));
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchAssignments();
+  }, [cid]);
   
   const courseAssignments = assignments.filter((assignment: any) => assignment.course === cid);
   
   const filteredAssignments = courseAssignments.filter((assignment: any) =>
     assignment.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -47,25 +64,29 @@ export default function Assignments() {
       hour12: true,
     });
   };
-
+  
   const handleDelete = (assignmentId: string) => {
     setAssignmentToDelete(assignmentId);
     setShowDeleteDialog(true);
   };
-
-  const confirmDelete = () => {
+  
+  const confirmDelete = async () => {
     if (assignmentToDelete) {
-      dispatch(deleteAssignment(assignmentToDelete));
-      setShowDeleteDialog(false);
-      setAssignmentToDelete(null);
+      try {
+        await client.deleteAssignment(assignmentToDelete);
+        dispatch(setAssignments(assignments.filter((a: any) => a._id !== assignmentToDelete)));
+        setShowDeleteDialog(false);
+        setAssignmentToDelete(null);
+      } catch (error) {
+        console.error("Error deleting assignment:", error);
+      }
     }
   };
-
   
   const handleAddAssignment = () => {
     router.push(`/Courses/${cid}/Assignments/new`);
   };
-
+  
   return (
     <div id="wd-assignments">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -83,7 +104,6 @@ export default function Assignments() {
           />
         </div>
         
-      
         {isFaculty && (
           <div>
             <Button variant="secondary" size="lg" className="me-2" id="wd-add-assignment-group">
@@ -102,7 +122,7 @@ export default function Assignments() {
           </div>
         )}
       </div>
-
+      
       <ListGroup className="rounded-0">
         <ListGroupItem className="p-0 fs-5 border-gray">
           <div className="p-3 ps-2 bg-secondary d-flex justify-content-between align-items-center">
@@ -116,7 +136,7 @@ export default function Assignments() {
               <IoEllipsisVertical className="fs-4" />
             </div>
           </div>
-
+          
           <ListGroup className="rounded-0">
             {filteredAssignments.map((assignment: any) => (
               <ListGroupItem 
@@ -148,9 +168,8 @@ export default function Assignments() {
                     {formatDate(assignment.dueDate)} | {assignment.points} pts
                   </div>
                 </div>
-
+                
                 <div className="float-end d-flex align-items-center">
-            
                   {isFaculty && (
                     <Button
                       variant="link"
@@ -168,7 +187,7 @@ export default function Assignments() {
           </ListGroup>
         </ListGroupItem>
       </ListGroup>
-
+      
       <Modal show={showDeleteDialog} onHide={() => setShowDeleteDialog(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>

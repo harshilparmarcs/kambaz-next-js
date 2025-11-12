@@ -1,25 +1,29 @@
 
 "use client";
 import Link from "next/link";
-import { redirect } from "next/dist/client/components/navigation";
+import { useRouter } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import * as db from "../../Database";
 import { FormControl, Button } from "react-bootstrap";
+import * as client from "../client";
 
 export default function Signin() {
   const [credentials, setCredentials] = useState<any>({});
- const dispatch = useDispatch();
- const signin = () => {
-   const user = db.users.find(
-     (u: any) =>
-       u.username === credentials.username &&
-       u.password === credentials.password
-   );
-   if (!user) return;
-   dispatch(setCurrentUser(user));
-   redirect("/Dashboard");
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const signin = async () => {
+    try {
+      const user = await client.signin(credentials);
+      if (!user) return;
+      dispatch(setCurrentUser(user));
+      router.push("/Dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Sign in failed");
+      console.error("Signin error:", err);
+    }
  };
 
   return (
@@ -38,3 +42,7 @@ export default function Signin() {
       <Button onClick={signin} id="wd-signin-btn" className="w-100" > Sign in </Button>
       <Link id="wd-signup-link" href="/account/signup">Sign up</Link>
     </div> );}
+
+function setError(arg0: any) {
+  throw new Error("Function not implemented.");
+}
