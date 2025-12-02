@@ -6,7 +6,7 @@ const USERS_API = `${HTTP_SERVER}/api/users`;
 const axiosWithCredentials = axios.create({ withCredentials: true });
 
 export const findEnrollmentsForUser = async (userId: string) => {
-  const response = await axios.get(`${USERS_API}/${userId}/enrollments`);
+  const response = await axiosWithCredentials.get(`${USERS_API}/${userId}/enrollments`);
   return response.data;
 };
 

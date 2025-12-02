@@ -4,6 +4,7 @@ import axios from "axios";
 const axiosWithCredentials = axios.create({ withCredentials: true });
 export const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 export const USERS_API = `${HTTP_SERVER}/api/users`;
+export const COURSE_USERS_API = `${HTTP_SERVER}/api/courses`;
 
 export const createUser = async (user: any) => {
   const response = await axios.post(`${USERS_API}`, user);
@@ -38,6 +39,13 @@ export const findAllUsers = async () => {
   const response = await axiosWithCredentials.get(USERS_API);
   return response.data;
 }
+
+export const findUsersForCourse = async (cid: string) => {
+  const response = await axiosWithCredentials.get(
+    `${COURSE_USERS_API}/${cid}/users`
+  );
+  return response.data;
+};
 
 export const profile = async () => {
   const response = await axiosWithCredentials.post(`${USERS_API}/profile`); 

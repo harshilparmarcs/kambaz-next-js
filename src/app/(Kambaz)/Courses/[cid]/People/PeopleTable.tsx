@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import * as client from "../../../account/client";
@@ -34,7 +34,7 @@ export default function PeopleTable({ users = [], fetchUsers }: { users?: any[];
                 </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {users.map((user : any) => (
                         <tr key={user._id}>
                             <td className="wd-full-name text-nowrap">
                                 <span className="text-decoration-none"
