@@ -1,5 +1,16 @@
 import { Form, Row, Col } from "react-bootstrap";
 
+const formatDateForInput = (dateString: string | null | undefined): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 function DetailsForm({
   quiz,
   onChange,
@@ -148,15 +159,11 @@ function DetailsForm({
             <Form.Label>Due Date</Form.Label>
             <Form.Control
               type="datetime-local"
-              value={
-                quiz.dueDate
-                  ? new Date(quiz.dueDate).toISOString().slice(0, 16)
-                  : ""
-              }
+              value={formatDateForInput(quiz.dueDate)}
               onChange={(e) =>
                 onChange(
                   "dueDate",
-                  e.target.value ? new Date(e.target.value) : null
+                  e.target.value ? new Date(e.target.value).toISOString() : null
                 )
               }
             />
@@ -167,15 +174,11 @@ function DetailsForm({
             <Form.Label>Available From</Form.Label>
             <Form.Control
               type="datetime-local"
-              value={
-                quiz.availableDate
-                  ? new Date(quiz.availableDate).toISOString().slice(0, 16)
-                  : ""
-              }
+              value={formatDateForInput(quiz.availableDate)}
               onChange={(e) =>
                 onChange(
                   "availableDate",
-                  e.target.value ? new Date(e.target.value) : null
+                  e.target.value ? new Date(e.target.value).toISOString() : null
                 )
               }
             />
@@ -186,15 +189,11 @@ function DetailsForm({
             <Form.Label>Until</Form.Label>
             <Form.Control
               type="datetime-local"
-              value={
-                quiz.untilDate
-                  ? new Date(quiz.untilDate).toISOString().slice(0, 16)
-                  : ""
-              }
+              value={formatDateForInput(quiz.untilDate)}
               onChange={(e) =>
                 onChange(
                   "untilDate",
-                  e.target.value ? new Date(e.target.value) : null
+                  e.target.value ? new Date(e.target.value).toISOString() : null
                 )
               }
             />
