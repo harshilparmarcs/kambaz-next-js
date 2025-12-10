@@ -45,6 +45,9 @@ export default function TakeQuizPage() {
         payload
       );
       setResult(attempt);
+      setTimeout(() => {
+        router.push(`/Courses/${cid}/Quizzes/${qid}`);
+      }, 1500);
     } catch (e: any) {
       setError(e?.response?.data?.message || "Unable to submit quiz.");
     }
